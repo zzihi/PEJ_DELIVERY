@@ -40,16 +40,4 @@ public class PolicyHandler{
 
     }
 
-    @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverCancel_Delivery(@Payload DeliveryCancelled deliveryCancelled){
-
-        if(deliveryCancelled.isMe()){
-            Optional<Delivery> deliveryOptional = deliveryRepository.findById(Long.valueOf("" + deliveryCancelled.getOrderId()));
-            Delivery delivery = deliveryOptional.get();
-
-            deliveryRepository.delete(delivery);
-            System.out.println("##### listener Delivery : " + deliveryCancelled.toJson());
-        }
-
-    }
 }

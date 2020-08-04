@@ -18,33 +18,29 @@ public class Delivery {
     private Integer prdPrice;
     private String prdNm;
 
-
-    @PrePersist
-    public void onPrePersist(){
-
-        // hystrix 테스트용
-        try {
-            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     @PostPersist
     public void onPostPersist(){
-        Shipped shipped = new Shipped();
-        BeanUtils.copyProperties(this, shipped);
-        shipped.publishAfterCommit();
-
+        if(!"CANCELLED".equals(this.deliveryStatus)){
+            Shipped shipped = new Shipped();
+            BeanUtils.copyProperties(this, shipped);
+            shipped.publishAfterCommit();
+        }
     }
 
-    @PreRemove
-    public void onPreRemove(){
-        DeliveryCancelled deliveryCancelled = new DeliveryCancelled();
-        BeanUtils.copyProperties(this, deliveryCancelled);
-        deliveryCancelled.publishAfterCommit();
+    @PreUpdate
+    public void onPreUpdate(){
+        if("CANCELLED".equals(this.deliveryStatus)){
+            DeliveryCancelled deliveryCancelled = new DeliveryCancelled();
+            BeanUtils.copyProperties(this, deliveryCancelled);
+            deliveryCancelled.publishAfterCommit();
 
+            // hystrix 테스트용
+            try {
+                Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
