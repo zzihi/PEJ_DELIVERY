@@ -15,6 +15,12 @@ import java.util.List;
     @RequestMapping(method=RequestMethod.POST, path="/cancellations")
     public void cancelDelivery(@RequestBody Delivery delivery){
 
+     try {
+        Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+     } catch (InterruptedException e) {
+        e.printStackTrace();
+     }
+     
      Delivery deliveryCancelled = deliveryRepository.findByOrderId(delivery.getOrderId());
      deliveryCancelled.setDeliveryStatus("CANCELLED");
      deliveryRepository.save(deliveryCancelled);
